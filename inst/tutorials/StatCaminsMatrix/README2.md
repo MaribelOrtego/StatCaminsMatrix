@@ -16,7 +16,9 @@ library("learnr")
 library("devtools")
 
 ## Download the tutorial from the repository:
-devtools::install_github("MaribelOrtego/StatCaminsMatrix")
+
+pak::pak("MaribelOrtego/StatCaminsMatrix")
+
 ## Execute the tutorial:
 learnr::run_tutorial("StatCaminsMatrix", "StatCaminsMatrix")
 
