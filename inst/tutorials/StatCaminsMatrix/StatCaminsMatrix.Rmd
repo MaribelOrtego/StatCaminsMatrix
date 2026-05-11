@@ -1,0 +1,712 @@
+---
+title: "MatrixAlgebra"
+subtitle: "
+<div id='logo-nom-subtitle' style='text-align:center;'>
+  <img src='www/logoUPC.png' style='height:50px; display:block; margin:0 auto 5px auto;'>
+  <p style='margin:0; font-weight:bold; color:#0055A4 !important; font-size:16px;'>Maribel Ortego</p>
+</div>"
+author: "Maribel Ortego"
+date: "`r format(Sys.time(), '%Y %B %d')`"
+
+output:
+  learnr::tutorial:
+    progressive: false
+    theme:
+      bslib: true
+      bootswatch: minty
+    css:
+      - "css/styles.css"
+      - "css/hero-image-css-v2.css"
+    includes:
+      in_header: "www/hero-image-PiE.html"
+    number_sections: TRUE
+    toc: true
+    toc_depth: 4
+    toc_float: true
+
+runtime: shiny_prerendered
+
+---
+
+```{r, label="generaloptions", include=FALSE}
+# Configuració general del tutorial
+library(learnr)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.width = 6,
+  out.width = "50%",
+  fig.align = "center",
+  fig.caption = TRUE,
+  fig.path = "images/"
+)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Matrius
+
+En aquest tutorial presentem els conceptes bàsics de matrius i la seva manipulació amb R.
+
+
+
+## Àlgebra de matrius
+
+A R, podem definir matrius utilitzant diferents combinacions d'instruccions. Donat un objecte, podem comprovar si és matriu, i les seves dimensions:
+
+```{r}
+A <- rbind(c(1,2,3), c(7,8,9), c(2,3,4))
+B <- matrix(c(2,4,6,-1,2,-1,10,11,12), ncol = 3, nrow = 3)
+C <- matrix(c(3, 1, 5,
+              0, 2, 4,
+              7, 6, 8),
+            nrow = 3, byrow = TRUE)
+is.matrix(A)
+dim(A)
+dim(B)
+```
+### 🖊Exercici:
+**Comprova les dimensions de la matriu C**
+```{r exercici_dimensions, exercise=TRUE}
+
+```
+A partir d'ara podem definir:
+
+- Transposada d'una matriu:
+```{r}
+t(A)
+```
+- Determinant d'una matriu:
+```{r}
+det(A)
+```
+
+- Inversa de matriu quadrada, si existeix
+```{r}
+solve(B)
+```
+
+- Suma, promig per files o per columnes ( que serà un vector)
+
+```{r}
+colSums(A)
+colMeans(A) 
+rowSums(A) 
+rowMeans(A)
+```
+
+- Els elements de la diagonal principal:
+```{r}
+diag(A) 
+```
+
+- Podem generar una matriu diagonal amb x a la diag
+```{r}
+x<-5
+diag(x) 
+```
+
+- Podem generar la matriu identitat d'ordre k:
+```{r} 
+D <- diag(3)
+D
+```
+
+### 🖊Exercici:
+**Per a la matriu C, calcula el seu determinant, la seva inversa i extreu els elements de la diagonal principal.**
+```{r exerc_matC, exercise=TRUE}
+
+```
+
+En ocasions no existeix la inversa de la matriu però sí la seva inversa generalitzada. En aquest cas, busquem la inversa generalitzada de Moore-Penrose amb la funció inclosa al paquet `MASS`. (Nota: per recordar millor que aquesta funció està a dins del paquet, utilitzem la notació paquet::funció(). Cal tenir el paquet `MASS` instal.lat.)
+
+```{r}
+MASS::ginv(A)
+```
+
+## Operacions amb matrius:
+
+Realitzem operacions amb matrius:
+
+- Suma i diferència de matrius:
+
+```{r}
+A + B
+A-B
+```
+
+- Producte per escalar
+
+```{r}
+s <- 10 #scalar mult
+s*A
+```
+
+- Producte de matrius:
+
+```{r}
+A%*%B
+```
+
+- Producte creuat:
+```{r}
+crossprod(A) #A'A.
+crossprod(A,B) #A'B
+```
+
+- Combinació de matrius horitzontalment:
+```{r}
+cbind(A, B) 
+```
+- Combinació de matrius verticalment:
+```{r}
+rbind(A, B)
+```
+
+### 🖊Exercici:
+**Realitza el producte creuat entre la matriu A i C.**
+```{r exerc2_matC, exercise=TRUE}
+
+```
+
+La caracterització i maneig de matrius és imprescindible en moltes tècniques matemàtiques i estadístiques. Podem caracteritzar matrius pels seus valors i vectors propis, pels seus valors singulars i descompondre utilitzant diverses tèciques:
+
+## Valors i vectors propis
+
+Podem trobar fàcilment els valors i vectors propis de la matriu (eigenvalues i eigenvectors)
+
+```{r}
+y <- eigen(A)
+
+y$val #are the eigenvalues of A and
+y$vec #are the eigenvectors of A
+```
+### 🖊Exercici:
+**Calcula els eigenvalues i els eigenvectors de la matriu C.**
+```{r eigen_matC, exercise=TRUE}
+
+```
+
+<!--
+## Descomposició Cholesky
+
+Podem realitzar la descomposició Choleski de la matriu. chol(A) conté una factorització triangular, que ens permet reconstruïr la matriu: 
+
+```{r}
+#R <- chol(B)
+```
+Amb aquesta notació, R’R = B.
+
+-->
+
+
+## Descomposicio svd
+
+La descomposició svd ( _singular value decomposition_ ) és una de les més utilitzades:
+
+Obtenim els valors i els vectors singulars:
+
+```{r}
+y <- svd(A)
+y$d #is a vector containing the singular values of A,
+y$u #is a matrix with columns containing the left singular vectors of A, and
+y$v #is a matrix with columns containing the right singular vectors of A.
+```
+
+### Un exemple de SVD pas a pas
+
+```{r}
+A<- matrix(c(3,1,1,3), ncol = 2, nrow = 2, byrow=TRUE)
+A
+```
+
+- Calculem t(A)A i At(A)
+- Calculem els valors propis de cadascuna de les matrius
+- Calculem els valors singulars, que són les arrels quadrades dels valors propis
+- Calculem V. Els vectors propis de t(A) són les columnes de V (right singular vectors)
+- Calculem U. els vectors propis de At(A) són les columnes de U (left singular vectors)
+- Muntem sigma: matriu diagonal que a la diagonal té els valors singulars
+- Reconstruïm A com a producte U sigma t(V)
+
+# Aplicacions
+
+## Exemple a mà:
+
+Donada la matriu $A$,
+
+$$
+A = \begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+$$
+Calculem la seva matriu transposta:
+$$
+A^T = \begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+$$
+ I a continuació calculem les dues matrius $A^T A$ i 
+ $A A^T$:
+ $$
+A^T A = \begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+\begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+= \begin{bmatrix}
+10 & 6 \\
+6 & 10
+\end{bmatrix}
+$$
+
+$$
+A A^T = \begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+\begin{bmatrix}
+3 & 1 \\
+1 & 3
+\end{bmatrix}
+= \begin{bmatrix}
+10 & 6 \\
+6 & 10
+\end{bmatrix}
+$$
+
+Comencem buscant els valors propis de  la matriu $A^T A$. Cal resoldre:
+
+$$
+\text{det}\left(\begin{bmatrix}
+10 & 6 \\
+6 & 10
+\end{bmatrix} - \lambda \begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}\right) = 0
+$$
+
+Operant, arribem a l'equació:
+$$
+\lambda^2 - 20\lambda + 64 = 0
+$$
+
+D'on obtenim els dos valors propis:
+$$
+\lambda_1 = 16, \quad \lambda_2 = 4
+$$
+
+Els valors singulars són l'arrel quadrada dels valors propis:
+$$
+\sigma_1 = \sqrt{16} = 4, \quad \sigma_2 = \sqrt{4} = 2
+$$
+
+A continuació construïrem les matrius $U$ i $V$ a partir dels vectors propis corresponents als dos valors propis:
+
+Pel valor propi $\lambda_1 = 16$, trobem els vectors propis resolent:
+
+$$
+\left(\begin{bmatrix}
+10 & 6 \\
+6 & 10
+\end{bmatrix} - 16 \begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}\right)v = 0
+$$
+
+Operant obtenim:
+$$
+\begin{bmatrix}
+-6 & 6 \\
+6 & -6
+\end{bmatrix} \begin{bmatrix}
+v_1 \\
+v_2
+\end{bmatrix} = 0
+$$
+
+d'on obtenim el vector propi:
+$$
+v_1 = \frac{1}{\sqrt{2}} \begin{bmatrix}
+1 \\
+1
+\end{bmatrix}
+$$
+
+Anàlogament, pel valor propi $\lambda_2 = 4$ busquem el corresponent vector propi resolent:
+
+$$
+\left(
+\begin{bmatrix}
+10 & 6 \\
+6 & 10
+\end{bmatrix} 
+- 4 \begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}
+\right) v = 0
+$$
+
+d'on: 
+$$
+v_2 = \frac{1}{\sqrt{2}} \begin{bmatrix}
+1 \\
+-1
+\end{bmatrix}
+$$
+
+Construïm la matriu $V$ a partir dels vectors propis:
+$$
+V = \begin{bmatrix}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+$$
+
+Realitzem el mateix procediment per la matriu $A A^T$: obtenim valors propis, vectors propis i construïm la matriu $U$:
+$$
+U = \begin{bmatrix}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+$$
+
+La matriu $\Sigma$ és la matriu diagonal dels valors singulars:
+
+$$
+\Sigma = \begin{bmatrix}
+4 & 0 \\
+0 & 2
+\end{bmatrix}
+$$
+
+Així, podem descompondre la matriu $A$ com el producte de les tres matrius:
+$$
+A = \begin{bmatrix}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+\begin{bmatrix}
+4 & 0 \\
+0 & 2
+\end{bmatrix}
+\begin{bmatrix}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}}
+\end{bmatrix}
+$$
+
+
+
+
+
+Realitzem el procés directament amb la funció svd:
+
+```{r A}
+#A <- matrix(c(3,1,1,3), ncol = 2, nrow = 2, byrow=TRUE)
+A <- matrix(c(1,2,2,1), ncol = 2, nrow = 2, byrow=TRUE)
+A
+```
+
+```{r processvdA}
+SVDA <- svd(A)
+UsvdA<-SVDA$u #matriu U
+UsvdA
+VsvdA<-SVDA$v  #matriu V
+VsvdA
+dsvdA<-SVDA$d  
+dsvdA
+```
+
+I ara podem reconstruïr la matriu, sencera, i amb la dimensió reduïda:
+
+```{r svdreconstA}
+UsvdA%*% diag(SVDA$d) %*% t(VsvdA) 
+round(UsvdA%*% diag(SVDA$d) %*% t(VsvdA),2)#arrodonim a dos decimals
+```
+### 🖊Exercici:
+Sigui la matriu E:
+```{r mat_E}
+E <- matrix(c(2,4,3,1), ncol = 2, nrow = 2, byrow=TRUE)
+E
+```
+
+**Realitza svd per a la matriu E i reconstrueix la matriu.**
+
+```{r sdv_matE, exercise=TRUE}
+
+```
+
+## A mà 3x3
+
+Donada la matriu $A$,
+
+
+$$
+A = \begin{bmatrix}
+2 & 4 & 1 \\
+1 & 3 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+$$
+Calculem la seva transposta:
+$$
+A^T = \begin{bmatrix}
+2 & 1 & 0 \\
+4 & 3 & 0 \\
+1 & 0 & 0
+\end{bmatrix}
+$$
+Les dues matrius producte:
+$$
+A^T A = \begin{bmatrix}
+2 & 1 & 0 \\
+4 & 3 & 0 \\
+1 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+2 & 4 & 1 \\
+1 & 3 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+= \begin{bmatrix}
+5 & 11 & 2 \\
+11 & 25 & 4 \\
+2 & 4 & 1
+\end{bmatrix}
+$$
+
+$$
+A A^T = \begin{bmatrix}
+2 & 4 & 1 \\
+1 & 3 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+2 & 1 & 0 \\
+4 & 3 & 0 \\
+1 & 0 & 0
+\end{bmatrix}
+= \begin{bmatrix}
+21 & 14 & 0 \\
+14 & 10 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+$$
+
+I a continuació busquem els valors propis resolent:
+$$
+\text{det}(A^T A - \lambda I) = 0
+$$
+
+$$
+\text{det}\left(\begin{bmatrix}
+5 & 11 & 2 \\
+11 & 25 & 4 \\
+2 & 4 & 1
+\end{bmatrix} - \lambda \begin{bmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}\right) = 0
+$$
+
+Obtenim els valors propis:
+$$
+\lambda_1 = 29.19, \quad \lambda_2 = 1.80, \quad \lambda_3 = 0
+$$
+I els corresponents valors singulars:
+$$
+\sigma_1 = \sqrt{29.19} \approx 5.41, \quad \sigma_2 = \sqrt{1.80} \approx 1.34, \quad \sigma_3 = 0
+$$
+Busquem els vectors propis corresponents i construïm la matriu $V$:
+$$
+V = \begin{bmatrix}
+0.20 & 0.92 & 0.35 \\
+0.96 & -0.28 & 0.06 \\
+0.16 & 0.28 & -0.94
+\end{bmatrix}
+$$
+I amb un procediment anàleg, construïm la matriu $U$:
+$$
+U = \begin{bmatrix}
+0.80 & -0.60 & 0 \\
+0.60 & 0.80 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+$$
+
+La matriu dels valors singulars és:
+$$
+\Sigma = \begin{bmatrix}
+5.41 & 0 & 0 \\
+0 & 1.34 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+$$
+
+Finalment, podem descomposar la matriu original com el producte de les tres matrius:
+$$
+A = U \Sigma V^T = \begin{bmatrix}
+2 & 4 & 1 \\
+1 & 3 & 0 \\
+0 & 0 & 0
+\end{bmatrix}
+$$
+
+
+Realitzem el procés directament amb la funció svd:
+
+```{r AA}
+A <- matrix(c(2,8,1,1,5,0,0,0,0), ncol = 3, nrow = 3, byrow=TRUE)
+A
+```
+
+```{r processvdAA}
+SVDA <- svd(A)
+UsvdA<-SVDA$u #matriu U
+UsvdA
+VsvdA<-SVDA$v  #matriu V
+VsvdA
+dsvdA<-SVDA$d  
+dsvdA
+```
+
+I ara podem reconstruïr la matriu, sencera, i amb la dimensió reduïda:
+
+```{r svdreconstAA}
+UsvdA%*% diag(SVDA$d) %*% t(VsvdA) #hi ha valors molt petits
+round(UsvdA%*% diag(SVDA$d) %*% t(VsvdA),2) #arrodonim a dos decimals
+```
+
+Podem utilitzar aquesta descomposició per a reduïr dimensió. Avaluem la variabilitat representada pels dos primers valors singulars:
+
+```{r varexpAA}
+variance.explained <- prop.table(svd(A)$d^2)
+variance.explained
+variance.explained[1]+variance.explained[2]
+```
+
+Amb dues components representem tota la variablilitat. Aproximarem la matriu utilitzant les matrius d'ordre k=2:
+
+```{r svdreconstredAA}
+diag(SVDA$d[1:2])
+UsvdA[,1:2]
+ t(VsvdA)[,1:2]
+UsvdA[,1:2]%*% diag(SVDA$d[1:2]) %*%  t(VsvdA)[1:2,] #hi ha valors molt petits
+Apred2<-round(UsvdA[,1:2]%*% diag(SVDA$d[1:2]) %*%  t(VsvdA)[1:2,] ,2)
+```
+
+```{r svdreconstredcomAA}
+A-Apred2
+```
+
+### 🖊Exercici:
+Donada la matriu C:
+```{r}
+C <- matrix(c(3, 1, 5,
+              0, 2, 4,
+              7, 6, 8),
+            nrow = 3, byrow = TRUE)
+```
+
+**Quantes components necessitam per explicar el 100% de la variabilitat de la matriu C?**
+
+```{r sdvK_matc, exercise=TRUE}
+
+```
+
+```{r sdvK_matc-hint}
+variance.explained_C <- prop.table(svd(C)$d^2) 
+Comprova quantes components sumades donen 1.
+```
+
+# Aplicacions més complexes
+## Exemple _Ratings_
+
+Suposem que disposem de les puntuacions que 5 espectadors han donat a 4 sèries. Si hi ha un zero, l'espectador no ha puntuat la sèrie. 
+
+Volem predir els valors faltants, per exemple la puntuació a la tercera sèrie del primer del espectadors.
+
+```{r}
+R <- matrix(c(5,3,0,1,4,0,0,1,1,1,0,5,1,0,0,4,0,1,5,4), ncol = 4, nrow = 5, byrow=TRUE)
+R
+```
+
+La SVD descomposa la matriu en tres matrius $ U $, $\Sigma$  i $V^T $, tal que \[ R = U\Sigma V^T  , \]
+on $U$ és la matriu dels usuaris (ortogonal mxm), \( \Sigma \) és la matriu dels valors singulars (mxn) i $V^T$ és la transposada de la matriu de sèries (matriu ortogonal de mida nxn).
+
+Realitzem el procés directament amb la funció svd:
+
+```{r processvd}
+SVDR <- svd(R)
+Usvd<-SVDR$u #matriu U
+Usvd
+Vsvd<-SVDR$v  #matriu V
+Vsvd
+dsvd<-SVDR$d  
+dsvd
+```
+
+I ara podem reconstruïr la matriu, sencera, i amb la dimensió reduïda:
+
+```{r svdreconst}
+Usvd%*% diag(SVDR$d) %*% t(Vsvd) #hi ha valors molt petits
+round(Usvd%*% diag(SVDR$d) %*% t(Vsvd),2) #arrodonim a dos decimals
+```
+
+Podem utilitzar aquesta descomposició per a reduïr dimensió. Avaluem la variabilitat representada pels dos primers valors singulars:
+
+```{r varexp}
+variance.explained <- prop.table(svd(R)$d^2)
+variance.explained
+variance.explained[1]+variance.explained[2]
+```
+
+Amb dues components representem més d'un 80$%$ de la variablilitat. Aproximarem la matriu utilitzant les matrius d'ordre k=2:
+
+```{r svdreconstred}
+diag(SVDR$d[1:2])
+Usvd[,1:2]
+ t(Vsvd)[,1:2]
+Usvd[,1:2]%*% diag(SVDR$d[1:2]) %*%  t(Vsvd)[1:2,] #hi ha valors molt petits
+Rpred2<-round(Usvd[,1:2]%*% diag(SVDR$d[1:2]) %*%  t(Vsvd)[1:2,] ,2)
+Rpred3<-round(Usvd[,1:3]%*% diag(SVDR$d[1:3]) %*%  t(Vsvd)[1:3,] ,2) #arrodonim a dos decimals
+```
+Comprovem que les aproximacions són força bones:
+
+```{r svdreconstredcom}
+R-Rpred2
+R-Rpred3
+```
+Aquest exemple ens ha proporcionat una exemple de l'utilitat de la descomposició SVD. L'hem aplicat a una matriu _petita_ , però aquesta descomposició es pot aplicar a matrius de mida molt més gran. Penseu-hi la propera vegada que una plataforma us proposi una sèrie!
+
+# Referències {-}
+
+<div id="refs"></div>
+
+#  About / Canvis {-}
+
+Material creat per M. Ortego per les Assignatures de l'àmbit estadístic de l' ETSECCPB - UPC.
+
+Versió 1.0
+
+#  Crèdits {-}
+
+<a href="https://www.flaticon.com/free-icons/travel" title="travel icons">Travel icons created by IconBaandar - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/alert" title="alert icons">Alert icons created by Creatype - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/find" title="find icons">Find icons created by hqrloveq - Flaticon</a>
+
+<a href="https://www.flaticon.com/free-icons/eye" title="eye icons">Eye icons created by Freepik - Flaticon</a>
+

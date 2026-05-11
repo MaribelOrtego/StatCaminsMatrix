@@ -1,0 +1,14 @@
+Package: StatCaminsMatrix
+Title: Basic Matrix Operations and SVD
+Version: 0.1.0
+Authors@R: 
+    person("Maribel", "Ortego", 
+    email= "ma.isabel.ortego@upc.edu", 
+    role = c("aut", "cre"))
+Description: Basic Matrix Operations and SVD.
+License: AGPL-3.0 license 
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Suggests: 
+    learnr
