@@ -48,9 +48,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Matrius
 
+## Matrius
+
 En aquest tutorial presentem els conceptes bàsics de matrius i la seva manipulació amb R.
-
-
 
 ## Àlgebra de matrius
 
@@ -72,6 +72,7 @@ dim(B)
 ```{r exercici_dimensions, exercise=TRUE}
 
 ```
+
 A partir d'ara podem definir:
 
 - Transposada d'una matriu:
@@ -175,7 +176,7 @@ La caracterització i maneig de matrius és imprescindible en moltes tècniques 
 
 ## Valors i vectors propis
 
-Podem trobar fàcilment els valors i vectors propis de la matriu (eigenvalues i eigenvectors)
+Podem trobar fàcilment els valors i vectors propis de la matriu ( _eigenvalues_ i _eigenvectors_)
 
 ```{r}
 y <- eigen(A)
@@ -184,7 +185,7 @@ y$val #are the eigenvalues of A and
 y$vec #are the eigenvectors of A
 ```
 ### 🖊Exercici:
-**Calcula els eigenvalues i els eigenvectors de la matriu C.**
+**Calcula els valors i vectors propis ( _eigenvalues_ i _eigenvectors_ ) de la matriu C.**
 ```{r eigen_matC, exercise=TRUE}
 
 ```
@@ -215,7 +216,7 @@ y$u #is a matrix with columns containing the left singular vectors of A, and
 y$v #is a matrix with columns containing the right singular vectors of A.
 ```
 
-### Un exemple de SVD pas a pas
+## Un exemple de SVD pas a pas
 
 ```{r}
 A<- matrix(c(3,1,1,3), ncol = 2, nrow = 2, byrow=TRUE)
@@ -230,9 +231,7 @@ A
 - Muntem sigma: matriu diagonal que a la diagonal té els valors singulars
 - Reconstruïm A com a producte U sigma t(V)
 
-# Aplicacions
-
-## Exemple a mà:
+## Exemple "a mà"
 
 Donada la matriu $A$,
 
@@ -407,12 +406,11 @@ $$
 
 
 
+## Resolució amb `svd`
 
-
-Realitzem el procés directament amb la funció svd:
+Realitzem el procés directament amb la funció `svd`:
 
 ```{r A}
-#A <- matrix(c(3,1,1,3), ncol = 2, nrow = 2, byrow=TRUE)
 A <- matrix(c(1,2,2,1), ncol = 2, nrow = 2, byrow=TRUE)
 A
 ```
@@ -433,6 +431,7 @@ I ara podem reconstruïr la matriu, sencera, i amb la dimensió reduïda:
 UsvdA%*% diag(SVDA$d) %*% t(VsvdA) 
 round(UsvdA%*% diag(SVDA$d) %*% t(VsvdA),2)#arrodonim a dos decimals
 ```
+
 ### 🖊Exercici:
 Sigui la matriu E:
 ```{r mat_E}
@@ -446,10 +445,11 @@ E
 
 ```
 
-## A mà 3x3
+# Descomposició ordre superior
+
+## 3x3 "a mà"
 
 Donada la matriu $A$,
-
 
 $$
 A = \begin{bmatrix}
@@ -563,8 +563,9 @@ A = U \Sigma V^T = \begin{bmatrix}
 \end{bmatrix}
 $$
 
+## 3x3 amb funció
 
-Realitzem el procés directament amb la funció svd:
+Realitzem el procés de descomposició directament amb la funció `svd`:
 
 ```{r AA}
 A <- matrix(c(2,8,1,1,5,0,0,0,0), ncol = 3, nrow = 3, byrow=TRUE)
@@ -605,6 +606,7 @@ UsvdA[,1:2]
 UsvdA[,1:2]%*% diag(SVDA$d[1:2]) %*%  t(VsvdA)[1:2,] #hi ha valors molt petits
 Apred2<-round(UsvdA[,1:2]%*% diag(SVDA$d[1:2]) %*%  t(VsvdA)[1:2,] ,2)
 ```
+I avaluem la diferència entre la matriu original i l'aproximada:
 
 ```{r svdreconstredcomAA}
 A-Apred2
@@ -619,7 +621,7 @@ C <- matrix(c(3, 1, 5,
             nrow = 3, byrow = TRUE)
 ```
 
-**Quantes components necessitam per explicar el 100% de la variabilitat de la matriu C?**
+**Quantes components necessitam per explicar com a mínim el 90% de la variabilitat de la matriu C?**
 
 ```{r sdvK_matc, exercise=TRUE}
 
@@ -635,7 +637,8 @@ Comprova quantes components sumades donen 1.
 
 Suposem que disposem de les puntuacions que 5 espectadors han donat a 4 sèries. Si hi ha un zero, l'espectador no ha puntuat la sèrie. 
 
-Volem predir els valors faltants, per exemple la puntuació a la tercera sèrie del primer del espectadors.
+Disposem de la matriu de puntuacions. Volem predir els valors faltants, per exemple la puntuació a la tercera sèrie del primer del espectadors.
+
 
 ```{r}
 R <- matrix(c(5,3,0,1,4,0,0,1,1,1,0,5,1,0,0,4,0,1,5,4), ncol = 4, nrow = 5, byrow=TRUE)
@@ -645,7 +648,7 @@ R
 La SVD descomposa la matriu en tres matrius $ U $, $\Sigma$  i $V^T $, tal que \[ R = U\Sigma V^T  , \]
 on $U$ és la matriu dels usuaris (ortogonal mxm), \( \Sigma \) és la matriu dels valors singulars (mxn) i $V^T$ és la transposada de la matriu de sèries (matriu ortogonal de mida nxn).
 
-Realitzem el procés directament amb la funció svd:
+Realitzem el procés directament amb la funció `svd`:
 
 ```{r processvd}
 SVDR <- svd(R)
@@ -688,6 +691,7 @@ Comprovem que les aproximacions són força bones:
 R-Rpred2
 R-Rpred3
 ```
+
 Aquest exemple ens ha proporcionat una exemple de l'utilitat de la descomposició SVD. L'hem aplicat a una matriu _petita_ , però aquesta descomposició es pot aplicar a matrius de mida molt més gran. Penseu-hi la propera vegada que una plataforma us proposi una sèrie!
 
 # Referències {-}
